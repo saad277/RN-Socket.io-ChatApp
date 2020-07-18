@@ -14,10 +14,12 @@ import {
 
 import io from 'socket.io-client'
 
+import { GiftedChat } from 'react-native-gifted-chat'
+
 
 const HomeScreen = () => {
 
-    const [message, setMessage] = useState("")
+
     const [receivedMsg, setReceived] = useState([])
 
     const socket = useRef(null)
@@ -29,57 +31,67 @@ const HomeScreen = () => {
         socket.current.on("message", (message) => {
 
 
+            let sampleMessage = {
+
+                _id: Math.random(),
+                text: 'Hello developer',
+                createdAt: new Date(),
+                user: {
+                    _id: 2,
+                    name: 'React Native',
+                    avatar: 'https://placeimg.com/140/140/any',
+                },
+
+            }
+
+            sampleMessage.text = message
+
             console.log("received-->" + message)
 
-            setReceived((prevState) => [...prevState, message]
+            setReceived((prevState) => GiftedChat.append(prevState, sampleMessage)
             )
         })
+
+
+
+
+
+
 
     }, [])
 
 
-    const sendMessage = () => {
+    const onSend = (messages) => {
 
-        socket.current.emit("message", message)
+        socket.current.emit("message", messages[0].text)
 
-        setMessage("")
+
+        setReceived((prevState) => GiftedChat.append(prevState, messages))
+
+
+
 
     }
 
-    const receivedMessages = receivedMsg.map((x) => {
 
-        return (
-            <Text>{x}</Text>
-        )
-    })
+
     return (
-        <View style={styles.container}>
 
-            {receivedMessages}
+        <GiftedChat
+            messages={receivedMsg}
+            onSend={messages => onSend(messages)}
+            user={{
+                _id: 1,
+            }}
+        />
 
-            <TextInput
-                value={message}
-                onChangeText={(text) => setMessage(text)}
-                placeholder="Enter a chat message"
-                onSubmitEditing={sendMessage}
-            />
-            <Button title="Send" onPress={sendMessage} />
-        </View>
+
     )
 
 
 }
 
-const styles = StyleSheet.create({
 
-
-    container: {
-
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
-    }
-})
 
 
 export default HomeScreen;

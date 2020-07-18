@@ -1,17 +1,27 @@
 const io = require("socket.io")();
 
+const messageHandler=require("./handlers/messageHandlers")
+
+
+let currentUserId = 2;
+const userIds = {}
+
+
+
+
 
 io.on("connection", (socket) => {
 
     console.log("a user connected")
+    console.log(socket.id)
 
-    socket.on("message", (message) => {
+    userIds[socket.id] = currentUserId++;
 
-        console.log(message)
+    console.log(userIds)
 
-        io.emit("message",message)
 
-    })
+    messageHandler.handleMessage(socket,userIds)
+
 })
 
 
