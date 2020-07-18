@@ -39,6 +39,17 @@ io.on("connection", (socket) => {
 
     })
 
+    socket.on("action", (action) => {
+
+        switch (action.type) {
+
+            case "server/hello":
+                console.log("got hello event", action.data);
+                socket.emit("action", { type: "message", data: "Good day!" })
+        }
+
+    })
+
 
 
 
