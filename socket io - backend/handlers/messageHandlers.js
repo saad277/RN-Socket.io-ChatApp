@@ -1,6 +1,6 @@
 let currentMessageId = 1
 
-function createMessage(userId, messageText) {
+function createMessage(user, messageText) {
 
     return {
 
@@ -8,8 +8,8 @@ function createMessage(userId, messageText) {
         text: messageText,
         createdAt: new Date(),
         user: {
-            _id: userId,
-            name: 'React Native',
+            _id: user.userId,
+            name: user.username,
             avatar: 'https://placeimg.com/140/140/any',
         },
 
@@ -18,7 +18,7 @@ function createMessage(userId, messageText) {
 }
 
 
-function handleMessage(socket, userIds) {
+function handleMessage(socket, users) {
 
     socket.on("message", (message) => {
 
@@ -26,9 +26,9 @@ function handleMessage(socket, userIds) {
 
         // io.emit("message", message)
 
-        const userId = userIds[socket.id]
+        const user = users[socket.id]
 
-        const messageToSend = createMessage(userId, message)
+        const messageToSend = createMessage(user, message)
 
         console.log(messageToSend)
 

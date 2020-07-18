@@ -1,6 +1,6 @@
 
 
-import React,{useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -13,13 +13,27 @@ import {
 import io from 'socket.io-client'
 
 import HomeScreen from './Components/Screens/HomeScreen'
+import JoinScreen from './Components/Screens/JoinScreen'
 
-const App=()=>{
+import { createAppContainer, createSwitchNavigator } from 'react-navigation'
 
- 
 
-  return(
-    <HomeScreen/>
+const appStack = createSwitchNavigator({
+
+
+  JoinScreen: JoinScreen,
+  HomeScreen: HomeScreen,
+
+})
+
+const AppContainer = createAppContainer(appStack)
+
+const App = () => {
+
+
+
+  return (
+    <AppContainer />
   )
 
 

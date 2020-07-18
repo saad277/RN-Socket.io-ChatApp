@@ -16,11 +16,13 @@ import io from 'socket.io-client'
 
 import { GiftedChat } from 'react-native-gifted-chat'
 
+import JoinScreen from './JoinScreen'
 
 const HomeScreen = () => {
 
 
     const [receivedMsg, setReceived] = useState([])
+    const [hasJoined, setJoined] = useState(false)
 
     const socket = useRef(null)
 
@@ -73,20 +75,28 @@ const HomeScreen = () => {
 
     }
 
+    const joinChat = (username) => {
+
+        socket.current.emit("join", username)
+
+        setJoined(true)
+
+    }
+
 
 
     return (
 
         <GiftedChat
+            renderUsernameOnMessage={true}
             messages={receivedMsg}
             onSend={messages => onSend(messages)}
             user={{
                 _id: 1,
             }}
-        />
+        />)
 
 
-    )
 
 
 }
