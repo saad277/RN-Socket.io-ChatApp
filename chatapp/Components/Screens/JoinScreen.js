@@ -10,12 +10,14 @@ import {
     Button
 } from 'react-native';
 
+import { connect } from 'react-redux'
 
 
-
-const JoinScreen = ({ joinChat }) => {
+const JoinScreen = (props) => {
 
     const [username, setUsername] = useState("")
+
+
 
     return (
         <View style={styles.container}>
@@ -26,7 +28,11 @@ const JoinScreen = ({ joinChat }) => {
                 onChangeText={(text) => setUsername(text)}
                 value={username}
             />
-            <Button title="Join" style={{ width: 30 }} onPress={() => joinChat(username)} />
+            <Button title="Join" style={{ width: 30 }} 
+            onPress={() => { 
+                props.joinChat(username) 
+                props.navigation.navigate("UserStack")
+                }} />
         </View>
     )
 
@@ -49,4 +55,22 @@ const styles = StyleSheet.create({
 
 })
 
-export default JoinScreen;
+
+const dispatchStateToProps = (dispatch) => {
+
+    return {
+
+        joinChat: (username) => {
+
+            dispatch({
+
+                type: "server/join",
+                data: username
+            })
+
+        }
+    }
+
+}
+
+export default connect(null, dispatchStateToProps)(JoinScreen);

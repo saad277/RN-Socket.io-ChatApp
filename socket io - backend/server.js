@@ -46,6 +46,19 @@ io.on("connection", (socket) => {
             case "server/hello":
                 console.log("got hello event", action.data);
                 socket.emit("action", { type: "message", data: "Good day!" })
+                break;
+
+            case "server/join":
+                console.log("Got Join Event", action.data)
+                users[socket.id].username = action.data
+                users[socket.id].avatar = createUserAvatar()
+                console.log(users)
+                const values = Object.values(users)
+                const onlyWithUserNames = values.filter((x) => x.username != undefined)
+                io.emit("action", { type: "users_online", data: onlyWithUserNames })
+                break;
+
+
         }
 
     })
