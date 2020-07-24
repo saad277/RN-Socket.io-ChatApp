@@ -28,6 +28,7 @@ const FriendList = (props) => {
 
                     return <Text>{item.username}</Text>
                 }}
+                keyExtractor={(item) => item.username}
             />
         </View>
     )

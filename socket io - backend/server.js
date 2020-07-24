@@ -2,9 +2,10 @@ const io = require("socket.io")();
 
 const messageHandler = require("./handlers/messageHandlers")
 
+//const uuidv1 = require("uuid/v1")
 
-let currentUserId = 2;
 
+let userId = 2
 
 let users = {}
 
@@ -18,13 +19,21 @@ function createUserAvatar() {
 
 }
 
+const createUsersOnline = (users) => {
+
+    const values = Object.values(users)
+    const onlyWithUserNames = values.filter((x) => x.username != undefined)
+
+    return onlyWithUserNames
+
+}
 
 io.on("connection", (socket) => {
 
     console.log("a user connected")
     console.log(socket.id)
 
-    users[socket.id] = { userId: currentUserId++ }
+    users[socket.id] = { userId: userId++ }
 
     console.log(users)
 
@@ -36,6 +45,19 @@ io.on("connection", (socket) => {
         console.log(users)
 
         messageHandler.handleMessage(socket, users) // if u place this inside join event then it will only fire when user has joined 
+
+    })
+
+
+    socket.on("disconnect", () => {
+
+        delete users[socket.id]
+        const onlyWithUserNames = createUsersOnline(users)
+        io.emit("action", { type: "users_online", data: onlyWithUserNames })
+
+        console.log("disconnect")
+
+        console.log(users)
 
     })
 
@@ -53,8 +75,8 @@ io.on("connection", (socket) => {
                 users[socket.id].username = action.data
                 users[socket.id].avatar = createUserAvatar()
                 console.log(users)
-                const values = Object.values(users)
-                const onlyWithUserNames = values.filter((x) => x.username != undefined)
+
+                const onlyWithUserNames = createUsersOnline(users)
                 io.emit("action", { type: "users_online", data: onlyWithUserNames })
                 break;
 
