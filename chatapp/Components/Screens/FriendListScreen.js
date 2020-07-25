@@ -8,7 +8,9 @@ import {
     StatusBar,
     TextInput,
     FlatList,
-    Button
+    Button,
+    Image,
+    TouchableOpacity,
 } from 'react-native';
 
 import { connect } from 'react-redux'
@@ -21,16 +23,31 @@ const FriendList = (props) => {
     console.log(props.usersOnline)
 
     return (
+
         <View style={styles.container}>
             <FlatList
                 data={props.usersOnline}
                 renderItem={({ item }) => {
 
-                    return <Text>{item.username}</Text>
+                    return (
+                        <TouchableOpacity onPress={() => props.navigation.navigate("HomeScreen", { name: item.username, userId: item.userId })}>
+                            <View style={styles.itemContainer}>
+                                <Image
+                                    style={styles.avatarContainer}
+                                    source={{ uri: item.avatar }} />
+
+                                <View style={styles.itemContaier}>
+                                    <Text style={{ fontSize: 20 }}>{item.username}</Text>
+                                </View>
+
+                            </View>
+                        </TouchableOpacity>
+                    )
                 }}
-                keyExtractor={(item) => item.username}
+                keyExtractor={(item) => item.userId}
             />
         </View>
+
     )
 
 
@@ -39,6 +56,19 @@ const FriendList = (props) => {
 const styles = StyleSheet.create({
 
     container: {
+        flex: 1,
+
+    },
+    itemContainer: {
+        flex: 1,
+        flexDirection: "row"
+    },
+    avatarContainer: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+    },
+    itemContaier: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center"

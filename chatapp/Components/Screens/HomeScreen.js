@@ -16,83 +16,30 @@ import io from 'socket.io-client'
 
 import { GiftedChat } from 'react-native-gifted-chat'
 
-import JoinScreen from './JoinScreen'
-
-const HomeScreen = () => {
-
-
-    const [receivedMsg, setReceived] = useState([])
-    const [hasJoined, setJoined] = useState(false)
-
-    const socket = useRef(null)
-
-    useEffect(() => {
-
-        socket.current = io("http://192.168.144.1:3001")
-
-        socket.current.on("message", (message) => {
-
-
-            let sampleMessage = {
-
-                _id: Math.random(),
-                text: 'Hello developer',
-                createdAt: new Date(),
-                user: {
-                    _id: 2,
-                    name: 'React Native',
-                    avatar: 'https://placeimg.com/140/140/any',
-                },
-
-            }
-
-            sampleMessage.text = message
-
-            console.log("received-->" + message)
-
-            setReceived((prevState) => GiftedChat.append(prevState, sampleMessage)
-            )
-        })
+import { connect } from 'react-redux'
 
 
 
+const HomeScreen = (props) => {
 
+    const userId = props.navigation.getParam("userId")
 
-
-
-    }, [])
-
-
-    const onSend = (messages) => {
-
-        socket.current.emit("message", messages[0].text)
-
-
-        setReceived((prevState) => GiftedChat.append(prevState, messages))
-
-
-
-
-    }
-
-    const joinChat = (username) => {
-
-        socket.current.emit("join", username)
-
-        setJoined(true)
-
-    }
-
-
+    let messages = props.conversations[userId].messages
 
     return (
 
         <GiftedChat
             renderUsernameOnMessage={true}
-            messages={receivedMsg}
-            onSend={messages => onSend(messages)}
+            messages={[]}
+            onSend={messages => {
+                props.sendMessageLocally(messages, userId)
+
+                props.sendMessageToServer(messages, userId)
+
+            }}
+
             user={{
-                _id: 1,
+                _id: props.selfUser,
             }}
         />)
 
@@ -102,6 +49,57 @@ const HomeScreen = () => {
 }
 
 
+HomeScreen.navigationOptions = screenProps => {
+
+    return {
+        title: screenProps.navigation.getParam("name")
+    }
+
+};
 
 
-export default HomeScreen;
+
+const dispatchStateToProps = (dispatch) => {
+
+
+    return {
+
+        sendMessageLocally: (messages, userId) => {
+
+            dispatch({
+
+                type: "private_message",
+                data: {
+                    text: messages[0],
+                    conversationId: userId
+                }
+            })
+        },
+        sendMessageToServer: (messages, userId) => {
+
+            dispatch({
+
+                type: "server/private_message",
+                data: {
+                    text: messages[0],
+                    conversationId: userId
+                }
+            })
+
+        }
+
+    }
+}
+
+
+const mapStateToProps = (state) => {
+
+    return {
+
+        selfUser: state.selfUser,
+        conversations: state.conversations
+    }
+
+}
+
+export default connect(mapStateToProps, dispatchStateToProps)(HomeScreen);

@@ -17,7 +17,7 @@ store.subscribe(() => {
     console.log("new state", store.getState())
 })
 
-store.dispatch({ type: 'server/hello', data: 'Hello!' });
+
 
 
 export default store;

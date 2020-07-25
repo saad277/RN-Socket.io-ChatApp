@@ -37,16 +37,7 @@ io.on("connection", (socket) => {
 
     console.log(users)
 
-    socket.on("join", (username) => {
 
-        users[socket.id].username = username
-        users[socket.id].avatar = createUserAvatar()
-
-        console.log(users)
-
-        messageHandler.handleMessage(socket, users) // if u place this inside join event then it will only fire when user has joined 
-
-    })
 
 
     socket.on("disconnect", () => {
@@ -65,10 +56,7 @@ io.on("connection", (socket) => {
 
         switch (action.type) {
 
-            case "server/hello":
-                console.log("got hello event", action.data);
-                socket.emit("action", { type: "message", data: "Good day!" })
-                break;
+
 
             case "server/join":
                 console.log("Got Join Event", action.data)
@@ -78,8 +66,33 @@ io.on("connection", (socket) => {
 
                 const onlyWithUserNames = createUsersOnline(users)
                 io.emit("action", { type: "users_online", data: onlyWithUserNames })
+
+                socket.emit("action", { type: "self_user", data: users[socket.id] })
                 break;
 
+            case "server/private_message":
+                const conversationId = action.data.conversationId;
+                const from = users[socket.id].userId
+                const userValues = Object.values(users)
+                const socketIds = Object.values(users)
+
+                for (let i = 0; i < userValues.length; i++) {
+
+                    if (userValues[i].userId === conversationId) {
+
+                        const socketId = socketIds[i]
+                        io.sockets.sockets[socketId].emit("action", {
+                            type: "private_message",
+                            data: {
+                                ...action.data,
+                                conversationId: from
+                            }
+                        })
+
+                        break;
+                    }
+                }
+                break;
 
         }
 
